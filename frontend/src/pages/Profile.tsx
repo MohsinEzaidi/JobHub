@@ -40,20 +40,19 @@ const Profile = () => {
   const [tempEmail, setTempEmail] = useState(user.email);
   const [isLoading, setIsLoading] = useState(true);
 
-const getInitials = () => {
-  return `${user.prenom?.[0] || ""}${user.nom?.[0] || ""}`.toUpperCase();
-};
-
+  const getInitials = () => {
+    return `${user.prenom?.[0] || ""}${user.nom?.[0] || ""}`.toUpperCase();
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await axiosInstance.get("profile/");
         const userData: BackendUser = response.data;
-        console.log(userData)
+        console.log(userData);
 
         const formattedUser = {
-          nom: userData.last_name,
+          nom: userData.last_name, // Match Django fields
           prenom: userData.first_name,
           email: userData.email,
           joinDate: new Date(userData.date_joined).toLocaleDateString("en-US", {
@@ -113,6 +112,47 @@ const getInitials = () => {
     }
   }, [navigate]);
 
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await axiosInstance.put("profile/update/", {
+        first_name: tempPrenom,
+        last_name: tempNom,
+        email: tempEmail,
+      });
+
+      if (response.status === 200) {
+        const updatedUser = {
+          ...user,
+          nom: tempNom,
+          prenom: tempPrenom,
+          email: tempEmail,
+        };
+        setUser(updatedUser);
+        localStorage.setItem("userData", JSON.stringify(updatedUser));
+        setIsEditing(false);
+
+        // Add activity
+        const newActivity: Activity = {
+          id: Date.now().toString(),
+          type: "saved",
+          title: "Profil mis à jour",
+          date: "À l'instant",
+        };
+        const updatedActivities = [newActivity, ...activities.slice(0, 2)];
+        setActivities(updatedActivities);
+        localStorage.setItem(
+          "userActivities",
+          JSON.stringify(updatedActivities)
+        );
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+      }
+    }
+  };
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -165,8 +205,10 @@ const getInitials = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Mon Profil</h1>
-            <p className="text-gray-600">Gérer mon compte JobNest</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              My Profile
+            </h1>
+            <p className="text-gray-600">Gérer mon compte JobHub</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -188,7 +230,7 @@ const getInitials = () => {
                 {isEditing ? (
                   <>
                     <div>
-                      <label className="text-sm">Nom</label>
+                      <label className="text-sm">Last Name</label>
                       <input
                         type="text"
                         value={tempNom}
@@ -197,7 +239,7 @@ const getInitials = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-sm">Prénom</label>
+                      <label className="text-sm">First Name</label>
                       <input
                         type="text"
                         value={tempPrenom}
@@ -242,23 +284,41 @@ const getInitials = () => {
               <CardContent className="space-y-4">
                 {isEditing ? (
                   <>
-                    <Button onClick={handleSaveProfile} className="w-full bg-green-600 text-white">
-                      Enregistrer
+                    <Button
+                      onClick={handleUpdateProfile}
+                      className="w-full bg-green-600 text-white"
+                    >
+                      save
                     </Button>
-                    <Button variant="outline" className="w-full" onClick={() => setIsEditing(false)}>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setIsEditing(false)}
+                    >
                       Annuler
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button onClick={() => setIsEditing(true)} className="w-full bg-blue-600 text-white">
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      className="w-full bg-blue-600 text-white"
+                    >
                       <Edit className="w-4 h-4 mr-2" />
-                      Modifier le profil
+                      Edit Profil
                     </Button>
-                    <Button variant="outline" className="w-full" onClick={() => navigate("/saved-jobs")}>
-                      Voir favoris
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => navigate("/saved-jobs")}
+                    >
+                      Saved Jobs
                     </Button>
-                    <Button variant="destructive" className="w-full" onClick={handleLogout}>
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={handleLogout}
+                    >
                       <LogOut className="w-4 h-4 mr-2" />
                       Déconnexion
                     </Button>
@@ -275,19 +335,28 @@ const getInitials = () => {
             </CardHeader>
             <CardContent>
               {activities.length === 0 ? (
-                <p className="text-gray-500 text-center">Aucune activité récente</p>
+                <p className="text-gray-500 text-center">
+                  Aucune activité récente
+                </p>
               ) : (
                 activities.map((act) => (
-                  <div key={act.id} className="flex items-center justify-between p-2 bg-gray-100 my-1 rounded">
+                  <div
+                    key={act.id}
+                    className="flex items-center justify-between p-2 bg-gray-100 my-1 rounded"
+                  >
                     <div>
                       <p className="font-medium">{act.title}</p>
                       <p className="text-sm text-gray-500">{act.date}</p>
                     </div>
-                    <span className={`text-sm px-2 py-1 rounded-full ${
-                      act.type === "saved" ? "bg-blue-100 text-blue-800"
-                        : act.type === "applied" ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}>
+                    <span
+                      className={`text-sm px-2 py-1 rounded-full ${
+                        act.type === "saved"
+                          ? "bg-blue-100 text-blue-800"
+                          : act.type === "applied"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
                       {act.type}
                     </span>
                   </div>
@@ -302,4 +371,4 @@ const getInitials = () => {
   );
 };
 
-export default Profile;
+export default Profile;
