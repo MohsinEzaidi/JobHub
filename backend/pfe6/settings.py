@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','mohsin123.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -24,9 +24,7 @@ ALLOWED_HOSTS = ['*']
 SECRET_KEY = 'django-insecure-c)@5a@s$gz)k!$-b*-6hqunump0ilj^6&i42*+v5m5(&u2r+u)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -55,6 +53,12 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',  # Or IsAuthenticated as needed
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
  
@@ -96,11 +100,16 @@ MIDDLEWARE = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
+  "https://mohsin123.pythonanywhere.com",
     "http://localhost:8080",  # Add frontend port
     "http://127.0.0.1:8080",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+CSRF_TRUSTED_ORIGINS = ['https://mohsin123.pythonanywhere.com']
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',
