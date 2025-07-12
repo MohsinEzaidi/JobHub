@@ -60,6 +60,7 @@ const SavedJobs = () => {
 
   const handleApplyNow = (jobId: number) => {
     console.log("Applying to job:", jobId);
+    navigate(`/job/${jobId}`);
     // Add application logic here
   };
 
@@ -160,7 +161,7 @@ const SavedJobs = () => {
                         onClick={() => handleApplyNow(job.id)}
                         className="bg-blue-600 hover:bg-blue-700 flex-1 md:flex-none"
                       >
-                        Apply Now
+                        See Details
                       </Button>
                       <Button
                         variant="outline"

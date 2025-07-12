@@ -9,20 +9,14 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 class JobFilter(filters.FilterSet):
     titre = filters.CharFilter(lookup_expr='icontains')
     localisation = filters.CharFilter(lookup_expr='icontains')
-    # Add remote filter
-    teletravail = filters.BooleanFilter()
-    # Add experience filter
+    teletravail = filters.BooleanFilter()  # Note: matches the model's "teletravail" field
     experience = filters.CharFilter(lookup_expr='iexact')
-    # Add contract type filter
     contrat = filters.CharFilter(lookup_expr='iexact')
-    # Add salary range filter
-    salary_min = filters.NumberFilter(field_name='salaire', lookup_expr='gte')
-    salary_max = filters.NumberFilter(field_name='salaire', lookup_expr='lte')
 
     class Meta:
         model = Job
         fields = ['titre', 'localisation', 'teletravail', 'experience', 'contrat']
-
+        
 class JobListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Job.objects.all()

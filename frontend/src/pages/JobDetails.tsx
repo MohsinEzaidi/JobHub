@@ -55,10 +55,11 @@ const JobDetails = () => {
   const handleApply = () => {
     addNotification(
       "success",
-      "Application Submitted",
-      "Your application has been submitted successfully"
+      "navigating ...",
+      "You navigated successfully to the apply page"
     );
-    setApplied(true);
+    // setApplied(true);
+     window.open(`https://www.rekrute.com${job.lien}`, '_blank');
   };
 
   const toggleSaveJob = () => {

@@ -18,37 +18,78 @@ const Jobs = () => {
   );
   const [jobs, setJobs] = useState<any[]>([]);
   const { addNotification } = useNotification();
-  const [filters, setFilters] = useState<JobFilters>({
-    type: [],
-    salary: null,
-    experience: null,
-  });
+const [filters, setFilters] = useState<JobFilters>({
+  contrat: [],
+  experience: null,
+  teletravail: null,
+});
   const [loading, setLoading] = useState(true);
 
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("https://mohsin123.pythonanywhere.com/api/jobs/");
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
-
-      const data = await response.json();
-      setJobs(Array.isArray(data) ? data : data.results || []);
-    } catch (error) {
-      console.error("Error loading jobs:", error);
-      addNotification(
-        "error",
-        "API Error",
-        "Failed to load jobs. Please try again later."
-      );
-    } finally {
-      setLoading(false);
+const fetchJobs = async () => {
+  setLoading(true);
+  try {
+    const params = new URLSearchParams();
+    
+    // Add search query if it exists
+    if (searchQuery && searchQuery.trim() !== '') {
+      params.append('titre', searchQuery.trim());
     }
-  };
+    
+    // Add location filter if it exists
+    if (searchLocation && searchLocation.trim() !== '') {
+      params.append('localisation', searchLocation.trim());
+    }
+    
+    // Add contract type filters if they exist
+    if (filters.contrat && filters.contrat.length > 0) {
+      filters.contrat.forEach(type => {
+        if (type) params.append('contrat', type);
+      });
+    }
+    
+    // Add experience filter if it exists
+    if (filters.experience) {
+      params.append('experience', filters.experience);
+    }
+    
+    // Add remote work filter if it's set
+    if (filters.teletravail !== null && filters.teletravail !== undefined) {
+      params.append('teletravail', filters.teletravail.toString());
+    }
+
+    const url = `https://mohsin123.pythonanywhere.com/api/jobs/?${params.toString()}`;
+    console.log('Fetching jobs from:', url); // Debugging
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setJobs(Array.isArray(data) ? data : data.results || []);
+  } catch (error) {
+    console.error("Error loading jobs:", error);
+    addNotification(
+      "error",
+      "API Error",
+      "Failed to load jobs. Please try again later."
+    );
+    setJobs([]); // Set empty array on error
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchJobs();
-  }, []);
+  }, [searchQuery, searchLocation, filters]);
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    fetchJobs();
+  }, 500); // 500ms delay
+  
+  return () => clearTimeout(timer);
+}, [searchQuery, searchLocation, filters]);
 
   const handleSearch = (query: string, location: string) => {
     setSearchQuery(query);
@@ -87,6 +128,7 @@ const Jobs = () => {
 
     return true;
   });
+  console.log(jobs);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">

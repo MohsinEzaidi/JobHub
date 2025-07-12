@@ -26,6 +26,8 @@ class UserProfileView(generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+    
+
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     
@@ -88,3 +90,4 @@ class UpdateProfileView(generics.UpdateAPIView):
     
     def get_object(self):
         return self.request.user
+    
