@@ -21,6 +21,8 @@ ALLOWED_HOSTS = ['*','mohsin123.pythonanywhere.com', 'localhost', '127.0.0.1']
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO: SECURITY ISSUE - Move SECRET_KEY to environment variable
+# Use: SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-...')
 SECRET_KEY = 'django-insecure-c)@5a@s$gz)k!$-b*-6hqunump0ilj^6&i42*+v5m5(&u2r+u)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -31,6 +33,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tonemail@gmail.com'
+# TODO: SECURITY ISSUE - Move EMAIL_HOST_USER and EMAIL_HOST_PASSWORD to environment variables
 EMAIL_HOST_PASSWORD = 'admin'  # utilise un mot de passe d’application sécurisé
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
@@ -62,6 +65,8 @@ REST_FRAMEWORK = {
     ),
 }
  
+# NOTE: CORS_ALLOW_ALL_ORIGINS is set to True, which overrides CORS_ALLOWED_ORIGINS below
+# For production, consider setting this to False and using only CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -124,8 +129,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 
-
-AUTH_USER_MODEL = 'users.CustomUser'
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
