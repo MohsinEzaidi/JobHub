@@ -22,7 +22,7 @@ ALLOWED_HOSTS = ['*','mohsin123.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # TODO: SECURITY ISSUE - Move SECRET_KEY to environment variable
-# Use: SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-...')
+# Use: SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-...')
 SECRET_KEY = 'django-insecure-c)@5a@s$gz)k!$-b*-6hqunump0ilj^6&i42*+v5m5(&u2r+u)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -65,6 +65,8 @@ REST_FRAMEWORK = {
     ),
 }
  
+# NOTE: CORS_ALLOW_ALL_ORIGINS is set to True, which overrides CORS_ALLOWED_ORIGINS below
+# For production, consider setting this to False and using only CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
